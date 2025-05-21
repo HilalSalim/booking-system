@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام حجز الغرف</title>
+    <style>
+        body { 
+            font-family: 'Tajawal', sans-serif; 
+            text-align: center; 
+            direction: rtl; 
+            background-color: #f4f4f4; 
+            color: #333;
+        }
+        table { 
+            width: 70%; 
+            margin: auto; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+            background-color: #fff; 
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); 
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 12px; 
+            text-align: center; 
+        }
+        th {
+            background-color: #007BFF; 
+            color: white;
+        }
+        button { 
+            padding: 10px 15px; 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 5px; 
+            font-size: 14px; 
+            transition: 0.3s;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        .delete-btn { 
+            background-color: red; 
+            color: white; 
+        }
+        .confirm-btn {
+            background-color: #28a745; 
+            color: white; 
+        }
+        .print-btn, .save-btn { 
+            margin-top: 20px; 
+            padding: 12px 20px; 
+            color: white; 
+            font-size: 16px; 
+        }
+        .print-btn { 
+            background-color: #17a2b8; 
+        }
+        .save-btn { 
+            background-color: #ffc107; 
+        }
+        input, select { 
+            padding: 8px; 
+            font-size: 14px; 
+            border-radius: 5px; 
+            border: 1px solid #ccc; 
+            margin: 5px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>نظام حجز الغرف</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>الحصة</th>
+                <th>اسم المعلم</th>
+                <th>الغرفة</th>
+                <th>الإجراء</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <select id="session">
+                        <option value="">اختر الحصة</option>
+                        <option value="الحصة الأولى">الحصة الأولى</option>
+                        <option value="الحصة الثانية">الحصة الثانية</option>
+                        <option value="الحصة الثالثة">الحصة الثالثة</option>
+                        <option value="الحصة الرابعة">الحصة الرابعة</option>
+                        <option value="الحصة الخامسة">الحصة الخامسة</option>
+                        <option value="الحصة السادسة">الحصة السادسة</option>
+                        <option value="الحصة السابعة">الحصة السابعة</option>
+                        <option value="الحصة الثامنة">الحصة الثامنة</option>
+                    </select>
+                </td>
+                <td><input type="text" id="teacherName" placeholder="ادخل اسم المعلم"></td>
+                <td>
+                    <select id="room">
+                        <option value="">اختر الغرفة</option>
+                        <option value="الصف التفاعلي">الصف التفاعلي</option>
+                        <option value="غرفة مصادر المعلومات">غرفة مصادر المعلومات</option>
+                    </select>
+                </td>
+                <td><button class="confirm-btn" onclick="bookRoom()">تأكيد الحجز</button></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h2>جدول الحجوزات</h2>
+    <table id="reservationTable">
+        <thead>
+            <tr>
+                <th>الحصة</th>
+                <th>اسم المعلم</th>
+                <th>الغرفة</th>
+                <th>إجراء</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    
+    <button class="print-btn" onclick="printTable()">طباعة الجدول</button>
+    <button class="save-btn" onclick="saveAsPDF()">حفظ كملف PDF</button>
+    
+    <p id="thankYouMessage" style="display: none; color: green; font-weight: bold;">شكراً لك على استخدامك لنظام الحجز الذكي</p>
+
+    <!-- شعار المدرسة والفوتر -->
+    <footer style="margin-top: 40px; text-align: center; font-size: 14px; color: #555;">
+        <img src="شعار_الإبداع_7_page-0001-removebg-preview.png" alt="شعار مدرسة الإبداع" style="width: 120px; margin-bottom: 10px;">
+        <p>تصميم وإعداد: <strong>الأستاذ هلال السناني</strong></p>
+    </footer>
+
+    <script>
+        function bookRoom() {
+            let session = document.getElementById("session").value;
+            let teacherName = document.getElementById("teacherName").value.trim();
+            let room = document.getElementById("room").value;
+            let thankYouMessage = document.getElementById("thankYouMessage");
+            
+            if (session === "" || teacherName === "" || room === "") {
+                alert("يرجى اختيار الحصة وكتابة اسم المعلم واختيار الغرفة قبل الحجز.");
+                return;
+            }
+            
+            let reservationTable = document.getElementById("reservationTable").getElementsByTagName('tbody')[0];
+            
+            for (let row of reservationTable.rows) {
+                if (row.cells[0].innerText === session && row.cells[2].innerText === room) {
+                    alert("هذه الحصة محجوزة بالفعل لهذه الغرفة.");
+                    return;
+                }
+            }
+            
+            let newRow = reservationTable.insertRow();
+            newRow.insertCell(0).innerText = session;
+            newRow.insertCell(1).innerText = teacherName;
+            newRow.insertCell(2).innerText = room;
+            
+            let deleteCell = newRow.insertCell(3);
+            let deleteBtn = document.createElement("button");
+            deleteBtn.innerText = "إلغاء";
+            deleteBtn.className = "delete-btn";
+            deleteBtn.onclick = function() {
+                reservationTable.deleteRow(newRow.rowIndex - 1);
+            };
+            deleteCell.appendChild(deleteBtn);
+            
+            thankYouMessage.style.display = "block";
+        }
+        
+        function printTable() {
+            window.print();
+        }
+        
+        function saveAsPDF() {
+            alert("ميزة الحفظ كملف PDF ستتم إضافتها لاحقًا!");
+        }
+    </script>
+</body>
+</html>
